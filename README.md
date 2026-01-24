@@ -171,7 +171,3 @@ This project is proprietary software. All rights reserved.
 |------|------|--------------|
 | **You** | Project Owner & Designer | Vision, requirements, design direction (Haikyuu/Akira aesthetic), feature specifications |
 | **Claude (Anthropic)** | AI Development Partner | Architecture design, implementation, code generation, documentation |
-
----
-
-*GameOps - Built for the booth. Trusted by the game.*
