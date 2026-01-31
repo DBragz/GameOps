@@ -15,6 +15,7 @@ GameOps is a professional sports statistics tracking application designed for bo
 ### Frontend (React + TypeScript)
 - `client/src/pages/home.tsx` - Main game tracking interface
 - `client/src/components/` - Reusable UI components:
+  - `GameMenu.tsx` - Start new game or join existing game menu
   - `GameSetup.tsx` - Game configuration wizard
   - `Scoreboard.tsx` - Live scoreboard with team scores and clock
   - `PlayerRoster.tsx` - Player management with on-court/bench tracking
@@ -33,12 +34,13 @@ GameOps is a professional sports statistics tracking application designed for bo
 - `shared/schema.ts` - TypeScript types and Zod schemas for Game, Team, Player, Play
 
 ## Key Features
-1. **Basketball stat tracking**: Points (2PT/3PT/FT), rebounds, assists, steals, blocks, turnovers, fouls
-2. **Real-time game clock** with period management
-3. **Foul tracking** with visual warnings at 4-5 fouls
-4. **Team timeout tracking**
-5. **Print-optimized box score** for official scoresheets
-6. **Dark mode toggle** in top-right corner
+1. **Game menu**: Start new game or join existing active games
+2. **Basketball stat tracking**: Points (2PT/3PT/FT), rebounds, assists, steals, blocks, turnovers, fouls
+3. **Real-time game clock** with period management
+4. **Foul tracking** with visual warnings at 4-5 fouls
+5. **Team timeout tracking**
+6. **Print-optimized box score** for official scoresheets
+7. **Dark mode toggle** in top-right corner
 
 ## Running the App
 The application runs via `npm run dev` which starts both the Express backend and Vite frontend on port 5000.
@@ -50,6 +52,7 @@ The application runs via `npm run dev` which starts both the Express backend and
 - Focus on basketball with awareness for hockey and other sports
 
 ## Recent Changes
+- Added game menu with options to start new game or join existing games (January 2026)
 - Initial MVP implementation (January 2026)
 - Complete game setup wizard with team/player configuration
 - Full stat tracking interface with live updates
