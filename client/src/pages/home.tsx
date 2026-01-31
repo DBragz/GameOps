@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Scoreboard } from "@/components/Scoreboard";
@@ -12,9 +13,10 @@ import { PlayByPlay } from "@/components/PlayByPlay";
 import { GameSetup } from "@/components/GameSetup";
 import { GameControls } from "@/components/GameControls";
 import { GameMenu } from "@/components/GameMenu";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Game, Player, Play, SportType, GameRules } from "@shared/schema";
 
-type ViewState = "menu" | "setup" | "game";
+type ViewState = "menu" | "setup" | "game" | "view";
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9);
@@ -132,6 +134,20 @@ export default function Home() {
     setViewState("game");
   }, []);
 
+  const handleViewGame = useCallback((viewedGame: Game) => {
+    setGame(viewedGame);
+    setActiveTab("boxscore");
+    setViewState("view");
+  }, []);
+
+  const handleBackToMenu = useCallback(() => {
+    setGame(null);
+    setSelectedPlayerId(null);
+    setSelectedTeam(null);
+    setActiveTab("tracker");
+    setViewState("menu");
+  }, []);
+
   useEffect(() => {
     if (game?.isClockRunning && game.gameClockSeconds > 0) {
       clockInterval.current = setInterval(() => {
@@ -233,13 +249,24 @@ export default function Home() {
     });
   }, []);
 
-  const endGame = useCallback(() => {
-    setGame((prev) => {
-      if (!prev) return prev;
-      return { ...prev, status: "completed", isClockRunning: false };
-    });
-    setActiveTab("boxscore");
-  }, []);
+  const endGame = useCallback(async () => {
+    if (!game) return;
+    
+    const completedGame = { ...game, status: "completed" as const, isClockRunning: false };
+    
+    try {
+      await apiRequest("POST", "/api/games", completedGame);
+      queryClient.invalidateQueries({ queryKey: ["/api/games"] });
+    } catch (error) {
+      console.error("Failed to save completed game:", error);
+    }
+    
+    setGame(null);
+    setSelectedPlayerId(null);
+    setSelectedTeam(null);
+    setActiveTab("tracker");
+    setViewState("menu");
+  }, [game]);
 
   const togglePlayerOnCourt = useCallback(
     (playerId: string, team: "home" | "away") => {
@@ -431,6 +458,7 @@ export default function Home() {
       <GameMenu
         onStartNew={() => setViewState("setup")}
         onJoinGame={handleJoinGame}
+        onViewGame={handleViewGame}
       />
     );
   }
@@ -439,11 +467,62 @@ export default function Home() {
     return <GameSetup onStartGame={handleStartGame} />;
   }
 
+  if (viewState === "view" && game) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+          <div className="flex items-center justify-between px-4 py-2">
+            <Logo size="sm" />
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={handleBackToMenu} data-testid="button-back-to-menu">
+                Back to Menu
+              </Button>
+              <div className="h-6 w-px bg-border mx-2" />
+              <ThemeToggle />
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 p-4 space-y-4">
+          <div className="text-center py-2">
+            <span className="text-lg font-heading font-semibold text-green-500">FINAL</span>
+            <span className="mx-2 text-muted-foreground">|</span>
+            <span className="font-mono text-xl font-bold">
+              {game.awayTeam.abbreviation} {game.awayTeam.score} - {game.homeTeam.score} {game.homeTeam.abbreviation}
+            </span>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="boxscore" data-testid="tab-boxscore">
+                Box Score
+              </TabsTrigger>
+              <TabsTrigger value="plays" data-testid="tab-plays">
+                Play-by-Play
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="boxscore" className="mt-0">
+              <BoxScore game={game} />
+            </TabsContent>
+
+            <TabsContent value="plays" className="mt-0">
+              <Card className="h-[500px] overflow-hidden">
+                <PlayByPlay game={game} />
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    );
+  }
+
   if (!game) {
     return (
       <GameMenu
         onStartNew={() => setViewState("setup")}
         onJoinGame={handleJoinGame}
+        onViewGame={handleViewGame}
       />
     );
   }
