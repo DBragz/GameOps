@@ -11,7 +11,10 @@ import { BoxScore } from "@/components/BoxScore";
 import { PlayByPlay } from "@/components/PlayByPlay";
 import { GameSetup } from "@/components/GameSetup";
 import { GameControls } from "@/components/GameControls";
+import { GameMenu } from "@/components/GameMenu";
 import type { Game, Player, Play, SportType, GameRules } from "@shared/schema";
+
+type ViewState = "menu" | "setup" | "game";
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9);
@@ -36,6 +39,7 @@ function createDefaultStats() {
 }
 
 export default function Home() {
+  const [viewState, setViewState] = useState<ViewState>("menu");
   const [game, setGame] = useState<Game | null>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<"home" | "away" | null>(null);
@@ -118,9 +122,15 @@ export default function Home() {
       };
 
       setGame(newGame);
+      setViewState("game");
     },
     []
   );
+
+  const handleJoinGame = useCallback((joinedGame: Game) => {
+    setGame(joinedGame);
+    setViewState("game");
+  }, []);
 
   useEffect(() => {
     if (game?.isClockRunning && game.gameClockSeconds > 0) {
@@ -416,8 +426,26 @@ export default function Home() {
         : game.awayTeam
       : null;
 
-  if (!game) {
+  if (viewState === "menu") {
+    return (
+      <GameMenu
+        onStartNew={() => setViewState("setup")}
+        onJoinGame={handleJoinGame}
+      />
+    );
+  }
+
+  if (viewState === "setup") {
     return <GameSetup onStartGame={handleStartGame} />;
+  }
+
+  if (!game) {
+    return (
+      <GameMenu
+        onStartNew={() => setViewState("setup")}
+        onJoinGame={handleJoinGame}
+      />
+    );
   }
 
   return (
