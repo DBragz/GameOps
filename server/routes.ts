@@ -20,6 +20,15 @@ export async function registerRoutes(
     }
   });
 
+  app.put("/api/games/:id", async (req, res) => {
+    try {
+      const game = await storage.saveGame(req.params.id, req.body);
+      res.json(game);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save game" });
+    }
+  });
+
   app.get("/api/games", async (_req, res) => {
     try {
       const games = await storage.getAllGames();

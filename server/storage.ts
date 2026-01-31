@@ -5,6 +5,7 @@ export interface IStorage {
   createGame(config: InsertGame): Promise<Game>;
   getGame(id: string): Promise<Game | undefined>;
   updateGame(id: string, updates: Partial<Game>): Promise<Game | undefined>;
+  saveGame(id: string, game: Game): Promise<Game>;
   getAllGames(): Promise<Game[]>;
   deleteGame(id: string): Promise<boolean>;
   recordPlay(gameId: string, play: Omit<Play, "id">): Promise<Play | undefined>;
@@ -105,6 +106,11 @@ export class MemStorage implements IStorage {
     const updatedGame = { ...game, ...updates };
     this.games.set(id, updatedGame);
     return updatedGame;
+  }
+
+  async saveGame(id: string, game: Game): Promise<Game> {
+    this.games.set(id, game);
+    return game;
   }
 
   async getAllGames(): Promise<Game[]> {

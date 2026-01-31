@@ -255,7 +255,7 @@ export default function Home() {
     const completedGame = { ...game, status: "completed" as const, isClockRunning: false };
     
     try {
-      await apiRequest("POST", "/api/games", completedGame);
+      await apiRequest("PUT", `/api/games/${game.id}`, completedGame);
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
     } catch (error) {
       console.error("Failed to save completed game:", error);
