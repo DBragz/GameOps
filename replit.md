@@ -52,6 +52,7 @@ The application runs via `npm run dev` which starts both the Express backend and
 - Focus on basketball with awareness for hockey and other sports
 
 ## Recent Changes
+- End game now saves to "Games Completed" section for later viewing (January 2026)
 - Added game menu with options to start new game or join existing games (January 2026)
 - Initial MVP implementation (January 2026)
 - Complete game setup wizard with team/player configuration
