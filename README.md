@@ -206,7 +206,5 @@ This project is proprietary software. All rights reserved.
 
 ## Authors
 
-| Name | Role | Contribution |
-|------|------|--------------|
-| **You** | Project Owner & Designer | Vision, requirements, design direction (Haikyuu/Akira aesthetic), feature specifications |
-| **Claude (Anthropic)** | AI Development Partner | Architecture design, implementation, code generation, documentation |
+- **[Daniel Ribeirinha-Braga](github.com/dbragz)** - Project Creator & Designer
+- **Claude (Anthropic)** - AI Development Assistant
